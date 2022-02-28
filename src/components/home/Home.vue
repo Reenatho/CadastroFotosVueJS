@@ -1,0 +1,119 @@
+
+
+
+<template>
+    <div> 
+        <h1 class='centralizado'>{{ titulo }}</h1>
+
+        <input type='search' class='filtro' @input='filtro = $event.target.value' placeholder='filtre por parte do titulo'/>
+        {{ filtro }}
+        <ul class='lista-fotos'>
+            <li class='lista-fotos-item' v-for='foto of fotosComFiltro'>
+                
+                <meu-painel :titulo='foto.titulo'>
+                    <imagem-responsiva :url='foto.url' :titulo='foto.titulo'/>            
+                    <meu-botao 
+                        tipo='button'
+                        rotulo='Apagar'
+                        @botaoAtivado='remove(foto)'
+                        confirmacao=true
+                        estilo='perigo'
+                    />
+                </meu-painel>
+
+            </li>
+        </ul>
+
+    </div>
+</template>
+
+
+<script>
+
+import Painel from '../shared/painel/Painel.vue';
+import ImagemResponsiva from '../shared/imagem-responsiva/ImagemResponsiva.vue'
+import Botao from '../shared/botao/Botao.vue'
+
+export default {
+
+    components: {
+        'meu-painel' : Painel,
+        'imagem-responsiva': ImagemResponsiva,
+        'meu-botao': Botao,
+    },
+
+   
+
+    data(){
+        return{
+            titulo: 'AluraPic',
+            fotos: [],
+            filtro: '',
+            
+           
+        }
+    },
+
+    computed: {
+        fotosComFiltro(){
+            if(this.filtro){
+               let exp = new RegExp(this.filtro.trim(), 'i');
+               return this.fotos.filter(foto => exp.test(foto.titulo));
+            }else{
+                return this.fotos;
+            }
+        }
+    },
+    
+    methods: {
+        remove(foto){
+           
+            alert('remover a foto: '+ foto.titulo)
+            
+        }
+            
+    },
+        
+    created(){
+        let promise = this.$http.get('http://localhost:3000/v1/fotos');
+        promise
+            .then(res => res.json())
+            .then(fotos => this.fotos = fotos, err => console.log('err'))
+
+    }
+ 
+}
+</script>
+
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;500;700&display=swap');
+
+   
+
+    .centralizado{
+        text-align: center;
+    }
+
+    .lista-fotos{
+        list-style-type: none;
+    }
+
+    .lista-fotos .lista-fotos-item{
+        display: inline-block;
+    
+    }
+
+   
+
+    .filtro{
+        display: inline-block;
+        width: 100%;
+
+
+    }
+   
+</style>
+
+
